@@ -1,0 +1,196 @@
+MPASM  5.34                            MAIN.C   6-1-2011  14:04:19         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Error[108]  : Illegal character (/)
+                      00001 //
+Error[108]  : Illegal character (/)
+                      00002 //
+Error[108]  : Illegal character (/)
+                      00003 //      Hardware Notes
+Error[108]  : Illegal character (/)
+                      00004 //      PIC18F4520 running at 4MHz crystal
+Error[108]  : Illegal character (/)
+                      00005 //      main.c
+Error[108]  : Illegal character (/)
+                      00006 //      a programme to operate on a 2 line LCD in 4 bit mode
+Error[108]  : Illegal character (/)
+                      00007 //
+                      00008 
+                      00009                 
+Error[108]  : Illegal character (/)
+                      00010 //CONFIGURATION BITS ======================================================
+                      00011 
+Error[121]  : Illegal label (#pragma)
+Error[176]  : CONFIG Directive Error:  (value "OFF//OSCILLATORTYPEXT" not valid for setting "IESO")
+                      00012 #pragma config OSC=XT, IESO=OFF //oscillator type XT,oscillator switch OFF
+Error[121]  : Illegal label (#pragma)
+Error[176]  : CONFIG Directive Error:  (value "OFF//POWER-UPTIMERONBROWNOUTOFF" not valid for setting "BOREN")
+                      00013 #pragma config PWRT=OFF, BOREN=OFF //power-up timer ON brown out OFF
+Error[121]  : Illegal label (#pragma)
+Error[176]  : CONFIG Directive Error:  (value "OFF//WATCHDOGOFF" not valid for setting "WDT")
+                      00014 #pragma config WDT=OFF // watchdog OFF
+Error[121]  : Illegal label (#pragma)
+Error[176]  : CONFIG Directive Error:  (value "OFF//STACKOVERFLOWRESETENABLEON" not valid for setting "LVP")
+                      00015 #pragma config STVREN=ON, LVP=OFF //stack overflow reset enable ON
+Error[108]  : Illegal character (/)
+                      00016                                                         //low voltage programming OFF
+Error[121]  : Illegal label (#pragma)
+Error[176]  : CONFIG Directive Error:  (value "OFF//MAKEPORTBDIGITALI/O" not valid for setting "PBADEN")
+                      00017 #pragma config PBADEN=OFF // make PORTB digital I/O
+                      00018 
+Error[108]  : Illegal character (/)
+                      00019 //==========================================================================
+                      00020 
+Error[105]  : Cannot open file (Include File "p18f4520.h " not found)
+                      00021         #include <p18f4520.h >
+                      00022         #include "delay.h"
+Error[122]  : Illegal opcode (delay_ms)
+                      00001 void delay_ms(unsigned int); ; // function prototype
+                      00023         #include "LCD.h"
+                      00001         #define RS PORTDbits.RD4
+                      00002         #define EN PORTDbits.RD6
+                      00003         #define RW PORTDbits.RD5
+                      00004         #define POWER PORTDbits.RD7 
+                      00005         #define ON  1
+                      00006         #define OFF 0
+                      00007         
+MPASM  5.34                            MAIN.C   6-1-2011  14:04:19         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Error[122]  : Illegal opcode (write_4bit_data)
+                      00008 void write_4bit_data(char);;
+Error[122]  : Illegal opcode (write_8bit_data)
+                      00009 void write_8bit_data(char);;
+Error[122]  : Illegal opcode (init_display)
+                      00010 void init_display(void);;
+Error[122]  : Illegal opcode (send_msg)
+                      00011 void send_msg(unsigned char msg[]);;
+Error[122]  : Illegal opcode (clear_display)
+                      00012 void clear_display(void);;
+Error[122]  : Illegal opcode (set_address_line1)
+                      00013 void set_address_line1(unsigned char);;
+Error[122]  : Illegal opcode (set_address_line2)
+                      00014 void set_address_line2(unsigned char);;
+Error[122]  : Illegal opcode (write_command)
+                      00015 void write_command(unsigned char);;
+Error[122]  : Illegal opcode (write_data)
+                      00016 void write_data(unsigned char);;
+                      00017 
+Error[105]  : Cannot open file (Include File "i2c.h" not found)
+                      00024         #include <i2c.h>
+                      00025 
+Error[108]  : Illegal character (/)
+                      00026 // pre-processor directive to tell compiler to recognise 18F4520
+Error[115]  : Duplicate label ("RS" or redefining symbol that cannot be redefined)
+                      00027         #define RS PORTDbits.RD4
+Error[115]  : Duplicate label ("RW" or redefining symbol that cannot be redefined)
+                      00028         #define RW PORTDbits.RD5
+Error[115]  : Duplicate label ("EN" or redefining symbol that cannot be redefined)
+                      00029         #define EN PORTDbits.RD6
+Error[115]  : Duplicate label ("POWER" or redefining symbol that cannot be redefined)
+                      00030         #define POWER PORTDbits.RD7
+Error[115]  : Duplicate label ("ON" or redefining symbol that cannot be redefined)
+                      00031         #define ON 1
+Error[115]  : Duplicate label ("OFF" or redefining symbol that cannot be redefined)
+                      00032         #define OFF 0
+                      00033         
+                      00034         #define INITIALIZE 1
+                      00035         #define INITIALIZE_LCD  2
+                      00036         #define KEEP_TIME 3
+                      00037         #define UPDATE_DISPLAY 4
+                      00038 
+                      00039 
+                      00040 
+Error[108]  : Illegal character (/)
+                      00041 //      GLOBAL VARIABLES
+                      00042 
+Error[122]  : Illegal opcode (char)
+                      00043 unsigned char hours,minutes,seconds;
+Error[122]  : Illegal opcode (char)
+                      00044 unsigned char state;
+Error[108]  : Illegal character (/)
+                      00045 /*unsigned int seconds;
+MPASM  5.34                            MAIN.C   6-1-2011  14:04:19         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Error[122]  : Illegal opcode (int)
+                      00046 unsigned int tensMinutes;
+Error[122]  : Illegal opcode (int)
+                      00047 unsigned int tensSeconds;
+Error[122]  : Illegal opcode (int)
+                      00048 unsigned int minutes;
+Error[122]  : Illegal opcode (messageSeconds)
+                      00049 char messageSeconds[] = "Seconds:";
+Error[122]  : Illegal opcode (messageMinutes)
+                      00050 char messageMinutes[] = "Minutes:";
+Error[122]  : Illegal opcode (sAscii)
+                      00051 char sAscii;
+Error[122]  : Illegal opcode (mAscii)
+                      00052 char mAscii;
+Error[122]  : Illegal opcode (sAscii2)
+                      00053 char sAscii2;
+Error[122]  : Illegal opcode (mAscii2)
+                      00054 char mAscii2;
+Error[122]  : Illegal opcode (i)
+                      00055 int i = 0;*/
+                      00056 
+Error[108]  : Illegal character (/)
+                      00057 // FUNCTION PROTOTYPES
+                      00058 
+Error[122]  : Illegal opcode (setup_clock)
+                      00059 void setup_clock(void);;
+Error[122]  : Illegal opcode (get_time)
+                      00060 void get_time(void);;
+Error[122]  : Illegal opcode (display_time)
+                      00061 void display_time(void);;
+                      00062 
+Error[108]  : Illegal character (/)
+                      00063 //      MAIN FUNCTION
+                      00064 
+Error[122]  : Illegal opcode (setup_clock)
+                      00065 void setup_clock(void)
+Error[108]  : Illegal character ({)
+                      00066         {
+Warning[207]: Found label after column 1. (OpenI2C)
+Error[108]  : Illegal character (()
+                      00067         OpenI2C(MASTER,SLEW_OFF); ; //enable I2C at 400KHz
+Warning[207]: Found label after column 1. (StartI2C)
+Error[108]  : Illegal character (()
+                      00068         StartI2C();;
+Error[139]  : Maximum of 100 lines inside WHILE-ENDW
+Error[129]  : Expected (ENDW)
+                      00069         while(SSPCON2bits.ACKSTAT!=0); ; //wait for acknowledge
+Error[129]  : Expected (END)
+MPASM  5.34                            MAIN.C   6-1-2011  14:04:19         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+EN                                PORTDbits.RD6
+INITIALIZE                        1
+INITIALIZE_LCD                    2
+KEEP_TIME                         3
+OFF                               0
+ON                                1
+POWER                             PORTDbits.RD7
+RS                                PORTDbits.RD4
+RW                                PORTDbits.RD5
+UPDATE_DISPLAY                    4
+__18F4520                         00000001
+__DEBUG                           1
+
+Errors   :    65
+Warnings :     2 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
+
+

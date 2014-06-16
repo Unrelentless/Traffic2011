@@ -1,0 +1,170 @@
+
+
+//main.c a top_level to show how a state machine can control traffic light outputs
+
+
+#include	<p18f4520.h>
+#include <i2c.h>
+
+#include "delay_ms.h"
+//CONFIGURATION FUSES ======================================================
+#pragma config OSC=XT, IESO=OFF //oscillator type XT,oscillator switch OFF
+#pragma config PWRT=OFF, BOREN=OFF //power-up timer ON brown out OFF
+#pragma config WDT=OFF // watchdog OFF
+#pragma config STVREN=ON, LVP=OFF //stack overflow reset enable ON
+							//low voltage programming OFF
+#pragma config PBADEN=OFF // make PORTB digital I/O
+//==========================================================================
+#define overlap_1	1
+#define main_grn	2
+#define main_yellow	3
+#define overlap_2	4
+#define minor_grn	5
+#define minor_yellow	6
+
+void output_1(unsigned char);
+void output_2(unsigned char); //function prototypes
+void set_up_mux(void);
+void init(void);
+unsigned char state;
+
+void set_up_mux(void)
+	{
+	OpenI2C(MASTER,SLEW_OFF); //enable I2C at 100KHz
+
+	StartI2C();
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x40); //select MCP23016
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x06); //write to DDR for GPIO_0
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x00); //set GPIO_0 as outputs
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x00); //set GPIO_1 as outputs
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	StopI2C();
+	IdleI2C();
+	CloseI2C();
+	}
+
+void output_1(unsigned char data_A)
+	{
+	
+	OpenI2C(MASTER,SLEW_OFF); //enable I2C at 100KHz
+	IdleI2C();
+	StartI2C(); //send start sequence
+	IdleI2C();
+	WriteI2C(0x40);
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x00); // address GPIOI_0
+	while(SSPCON2bits.ACKSTAT!=0);
+	IdleI2C();
+	WriteI2C(data_A); // send 10101010 to GPIO_0
+	while(SSPCON2bits.ACKSTAT!=0);
+	IdleI2C();
+	StopI2C();
+	IdleI2C();
+	CloseI2C();
+	}
+	
+void output_2(unsigned char data_B)
+	{
+
+	OpenI2C(MASTER,SLEW_OFF); //enable I2C at 100KHz
+	IdleI2C();
+	StartI2C(); //send start sequence
+	IdleI2C();
+	WriteI2C(0x40);
+	while(SSPCON2bits.ACKSTAT!=0); //wait for acknowledge
+	IdleI2C();
+	WriteI2C(0x00); // address GPIOI_0
+	while(SSPCON2bits.ACKSTAT!=0);
+	IdleI2C();
+	WriteI2C(data_B); // send 10101010 to GPIO_0
+	while(SSPCON2bits.ACKSTAT!=0);
+	IdleI2C();
+	StopI2C();
+	IdleI2C();
+	CloseI2C();
+	}
+void init(void)
+	{
+	TRISB=0xFF; //use PORTB as switch inputs 
+	TRISC=0b11111111; 
+	TRISD=0x00; //used for LCD
+	state=overlap_1;
+	set_up_mux();
+	}
+void main (void)
+
+	{
+	init();
+while(1)
+{	
+	switch(state)
+	{
+	case overlap_1:
+	state=main_grn;
+	output_1(0b10000001); //Main Red No Walk
+	output_2(0b10000001); //Minor Red No Walk
+	delay_ms(1000);//just some delay here to test
+	break;
+	
+	case main_grn:
+	state=main_yellow;
+	output_1(0b10000100); //Main Green No Walk 
+	output_2(0b10000001); //Minor Red No Walk
+	delay_ms(5000);
+	break;
+	
+	case main_yellow:
+	state=overlap_2;
+	output_1(0b10000010); //Main Yellow No Walk 
+	output_2(0b10000001); //Minor Red No Walk
+	delay_ms(2000); //yellow delay
+	break;
+	
+	case overlap_2:
+	state=minor_grn;
+	output_1(0b10000001); //Main Red No Walk
+	output_2(0b10000001); //Minor Red No Walk
+	delay_ms(1000);//just some delay here to test
+	break;
+	
+	case minor_grn:
+	state=minor_yellow;
+	output_1(0b10000001); //Main Red No Walk 
+	output_2(0b10000100); //Minor Green No Walk
+	delay_ms(5000);
+	break;
+	
+	case minor_yellow:
+	state=overlap_1;
+	output_1(0b10000001); //Main Red No Walk 
+	output_2(0b10000010); //Minor Yellow No Walk
+	delay_ms(2000);//yellow delay here
+	break;
+	
+	default:
+	state= overlap_1;
+	
+	}
+
+}    
+	
+
+	
+	}
+
+
+	
+	
+
+
+
